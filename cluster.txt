@@ -1,1 +1,0 @@
-mongodb+srv://jciano22:g3t2at5N1U6qv4l2@cluster0-gp1kx.mongodb.net/test?retryWrites=true&w=majority
