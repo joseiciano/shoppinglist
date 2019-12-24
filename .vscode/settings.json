@@ -1,5 +1,8 @@
 {
-    "python.linting.pylintEnabled": true,
+    "python.linting.pylintEnabled": false,
     "python.linting.enabled": true,
-    "python.pythonPath": "C:\\Users\\ician\\AppData\\Local\\Programs\\Python\\Python37\\python.exe"
+    "python.pythonPath": "C:\\Users\\jciano22\\Documents\\workspace\\shoppinglist\\shoppinglist_env\\Scripts\\python.exe",
+    "python.linting.flake8Enabled": false,
+    "git.ignoreLimitWarning": true,
+    "python.linting.banditEnabled": true
 }

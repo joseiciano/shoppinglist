@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+  <textblock class="media content-section">
+    <div class="media-body">
+      <h2 class = "textblock-title">Shopping List Tracker</h2>
+      <p class="textblock-content">This application allows lets users track prices of given items. You will be able to add items you want to keep track of and see their price fluctuation over time. Doing so will help you know if you missed a good deal or should buy right now. </p>
+      <p class = "testblock-content">To start, simply create an account and then proceed to the "Check Prices" section of the website</p>
+      <small>Current Stores Supported: Amazon, Walmart</small>
+    </div>
+  </textblock>
+{% endblock content %}
+    
+{% block sidebar %} 
+  {% if current_user.is_authenticated %}
+    <div class="col-md-4">
+      <div class="content-section">
+        <h3>Our Sidebar</h3>
+        <button class="btn btn-secondary btn-lg btn-light btn-block">Home</button>
+        <button class="btn btn-secondary btn-lg btn-light btn-block">Announcements</button>
+        <button class="btn btn-secondary btn-lg btn-light btn-block">Check Prices</button>
+        <button class="btn btn-secondary btn-lg btn-light btn-block">Logout</button>
+      </div>
+    </div>
+  {% else %}
+    <div class="col-md-4">
+      <div class="content-section">
+        <h3>About us Sidebar</h3>
+        <button class="btn btn-secondary btn-lg btn-block">Home</button>
+        <button class="btn btn-secondary btn-lg btn-block">Announcements</button>
+        <button class="btn btn-secondary btn-lg btn-block">Calendars</button>
+        <button class="btn btn-secondary btn-lg btn-block">Login/Register</button>
+      </div>
+    </div>
+  {% endif %}
+{% endblock sidebar %}
