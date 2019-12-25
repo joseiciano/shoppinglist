@@ -1,8 +1,6 @@
 {
-    "python.linting.pylintEnabled": false,
-    "python.linting.enabled": true,
-    "python.pythonPath": "C:\\Users\\jciano22\\Documents\\workspace\\shoppinglist\\shoppinglist_env\\Scripts\\python.exe",
     "python.linting.flake8Enabled": false,
-    "git.ignoreLimitWarning": true,
-    "python.linting.banditEnabled": true
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.pythonPath": "pricechecker_env\\Scripts\\python.exe"
 }

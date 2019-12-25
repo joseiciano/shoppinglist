@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+  <form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Add an Item</legend>
+      <div class="form-group">
+        {{ form.url(class="form-control form-control-lg") }} 
+      </div>
+    </fieldset>
+    <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+
+
+<div>
+  <textblock class="media content-section" >
+    <div class="media-body">
+      <h2 class = "textblock-title">Check Items</h2>
+      <p class="textblock-content">This application allows lets users track prices of given items. You will be able to add items you want to keep track of and see their price fluctuation over time. Doing so will help you know if you missed a good deal or should buy right now. </p>
+      <p class = "testblock-content">To start, simply create an account and then proceed to the "Check Prices" section of the website</p>
+      <small>Current Stores Supported: Amazon, Walmart</small>
+    </div>
+  </textblock>
+</div>
+{% endblock content %}
+
