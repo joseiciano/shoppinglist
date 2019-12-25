@@ -1,17 +1,35 @@
 {% extends "layout.html" %}
 {% block content %}
+<div class="content-section">
+  <form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Add an Item</legend>
+      <div class="form-group">
+        {% if form.url.errors %}
+          {{ form.url(class="form-control form-control-lg is-invalid") }}
+          <div class="invalid-feedback">
+            {% for error in form.url.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.url(class="form-control form-control-lg") }}
+        {% endif %}
+      </div>
+    </fieldset>
+    <div class="form-group">
+      {{ form.submit(class="btn btn-outline-info") }}
+    </div>
+  </form>
+</div>
+
+
 <div>
   <textblock class="media content-section" >
     <div class="media-body">
       <h2 class = "textblock-title">Check Items</h2>
       <p class="textblock-content">
-        <form method="POST" action="">
-          {{ form.hidden_tag() }}
-          <div class="form-group">
-            {{ form.submit(class="btn btn-outline-info") }}
-          </div>
-        </form>
-
         {% for item in items %}
           <ul class="list-group">
             <li class = "list-group-item list-group-item-light"><strong>Name:</strong> {{ item.name }}</li>

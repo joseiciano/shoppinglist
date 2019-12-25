@@ -1,8 +1,9 @@
 from flask import render_template, url_for, flash, redirect, request
-from pricechecker import app, db, bcrypt, url_manager, webscraper
-from pricechecker.forms import RegistrationForm, LoginForm, ItemForm
+from pricechecker import app, db, bcrypt, webscraper
+from pricechecker.forms import RegistrationForm, LoginForm, ItemForm, RefreshForm
 from pricechecker.models import User, Item
 from flask_login import login_user, logout_user, current_user, logout_user, login_required
+from datetime import datetime
 import urllib
 
 @app.route("/")
@@ -61,7 +62,6 @@ def login():
 
 
 @app.route("/logout")
-@login_required
 def logout():
     logout_user()
     return redirect(url_for("home"))
@@ -74,27 +74,124 @@ def pricechecker():
     return render_template("pricechecker_main.html")
 
 
-@app.route("/pricechecker/additem", methods=["GET", "POST"])
-@login_required
-def pricechecker_additem():
-    return render_template("pricechecker_additem.html", form=ItemForm())
-
-
 @app.route("/pricechecker/checkitems", methods=["GET", "POST"])
 @login_required
 def pricechecker_checkitems():
-    form = ItemForm()
+    form = RefreshForm()
+    cur_userid = current_user.get_id()
+    items = Item.query.all()
 
+    # Checking db items
+    if form.validate_on_submit():
+        for item in items:
+            webscraper.set_to_url(item.url)
+            cur_price = webscraper.get_item_price()
+            last_price = item.prices[-1]
+
+            if cur_price == last_price:
+                price_change = 0
+            else:
+                price_change = webscraper.price_as_num(item.prices[-1]) - webscraper.price_as_num(cur_price)
+
+            db_item = Item.query.filter_by(store=item.store, name=item.name).first()
+            db_prices = db_item.prices
+            db_times = db_item.price_times
+            
+            db_prices.append(cur_price)
+            db_times.append(datetime.utcnow())
+
+            db_item.prices = ["dummy"]
+            db_item.price_times = ["dummyalso"]
+
+            db.session.commit()
+            db.session.refresh(db_item)
+
+            db_item.prices = db_prices
+            db_item.price_times = db_times
+            db.session.commit()
+        return redirect(url_for("pricechecker_checkitems"))
+
+    send_nuds = []
+    for item in items:
+        cur_item = {}
+        if str(cur_userid) in item.bought_by:
+            cur_item["name"] = item.name
+            cur_item["store"] = item.store
+            cur_item["price"] = item.prices[-1]
+
+            webscraper.set_to_url(item.url)
+            cur_price = webscraper.get_item_price()
+            last_price = item.prices[-1]
+
+            if cur_price == last_price:
+                price_change = 0
+            else:
+                price_change = webscraper.price_as_num(item.prices[-2]) - webscraper.price_as_num(item.prices[-1])
+                
+            cur_item["price_change"] = price_change
+            cur_item["price_time"] = datetime.utcnow()
+            send_nuds.append(cur_item)
+
+    return render_template("pricechecker_checkitems.html", form=form, items=send_nuds)
+
+
+@app.route("/pricechecker/additems", methods=["GET", "POST"])
+@login_required
+def pricechecker_additems():
+    form = ItemForm()
+    cur_userid = current_user.get_id()
+
+    # Adding a new item to the db
     if form.validate_on_submit():
         url = form.url.data
-        if url_manager.validate_url(url):
-            store = url_manager.get_store_name(url)
+        if webscraper.validate_url(url):
+            item_store = webscraper.get_store_name(url)
+            item_name = ''
+            item_price = ''
 
-            if type(store) == str:
+            # Get the item's name and price
+            if type(item_store) == str:
+                webscraper.set_to_url(url)
+                item_name = webscraper.get_item_name()
+                item_price = webscraper.get_item_price()
+                
+                # Check if the item is already in our database
+                db_item = Item.query.filter_by(store=item_store, name=item_name).first()
+                if db_item:
+                    item_list = db_item.bought_by
+                    item_list.append(cur_userid)
+                    db_item.bought_by = ["dummy"]
+                    db.session.commit()
+                    db.session.refresh(db_item)
+                    db_item.bought_by = item_list
+                    db.session.commit()
 
+                    db_item.bought_by.append(cur_userid)
+                    db.session.commit()
+                else:
+                    item = Item(name=item_name, url=url, store=item_store, prices=item_price, bought_by=cur_userid)
+                    user = User.query.filter_by(id=cur_userid).first()
+                    user.items.append(item_name)
+
+                    db.session.add(item)
+                    db.session.commit()
+                return redirect(url_for("pricechecker_checkitems"))
             else:
                 flash("Invalid Link", "danger")
         else:
             flash("Invalid Link", "danger")
+            return redirect(url_for("announcements"))
 
-    return render_template("pricechecker_checkitems.html", form=form)
+    # Checking db items
+    send_nuds = []
+    items = Item.query.all()
+    for item in items:
+        cur_item = {}
+        if str(cur_userid) in item.bought_by:
+            cur_item["name"] = item.name
+            cur_item["store"] = item.store
+            cur_item["price"] = item.prices[-1]
+            send_nuds.append(cur_item)
+
+    return render_template("pricechecker_additems.html", form=form, items=send_nuds)
+

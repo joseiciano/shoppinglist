@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from pricechecker.models import User
+from pricechecker.models import User, Item
 
 
 class RegistrationForm(FlaskForm):
@@ -32,3 +32,7 @@ class LoginForm(FlaskForm):
 class ItemForm(FlaskForm):
     url = StringField("url", validators=[DataRequired()])
     submit = SubmitField("Add Item")
+
+
+class RefreshForm(FlaskForm):
+    submit = SubmitField("Refresh")

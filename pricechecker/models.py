@@ -1,6 +1,6 @@
-from datetime import datetime
 from pricechecker import db, login_manager
 from flask_login import UserMixin
+from datetime import datetime
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -26,19 +26,21 @@ class User(db.Model, UserMixin):
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    store = db.Column(db.String(200), nullable=False)
-    item_prices = db.Column(db.PickleType(), nullable=False)
-    item_price_times = db.Column(db.PickleType(), nullable=False)
+    name = db.Column(db.String(512), nullable=False)
+    url = db.Column(db.String(512), unique=True, nullable=False)
+    store = db.Column(db.String(512), nullable=False)
+    prices = db.Column(db.PickleType(), nullable=False)
+    price_times = db.Column(db.PickleType(), nullable=False)
     bought_by = db.Column(db.PickleType(), nullable=False)
 
-    def __init__(self, name, store, cur_price, cur_price_time, bought_by):
+    def __init__(self, name, url, store, prices, bought_by):
         self.name = name
+        self.url = url
         self.store = store
-        self.item_prices = [cur_price]
-        self.item_price_times = [cur_price_time]
+        self.prices = [prices]
+        self.price_times = [datetime.utcnow()]
         self.bought_by = [bought_by]
 
     def __repr__(self):
-        return f"Item('{self.item_name}')"
+        return f"Item('{self.name}')"
 
